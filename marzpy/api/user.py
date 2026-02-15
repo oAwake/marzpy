@@ -1,212 +1,144 @@
-from .send_requests import *
+from dataclasses import dataclass, field
+from typing import Optional, Dict, Any, List
 
-def delete_if_exist(dic,keys:list):
-    for key in keys:
-        if key in dic:
-            del dic[key]
-    return dic
+
+# =========================================================
+# Model
+# =========================================================
+
+@dataclass
 class User:
-    def __init__(
-        self,
-        username: str,
-        proxies: dict,
-        inbounds: dict,  
-        data_limit: float,
-        data_limit_reset_strategy: str = "no_reset",
-        status="",
-        expire: float = 0,
-        used_traffic=0,
-        lifetime_used_traffic=0,
-        created_at="",
-        links=[],
-        subscription_url="",
-        excluded_inbounds={},
-        note = "",
-        on_hold_timeout= 0,
-        on_hold_expire_duration = 0,
-        sub_updated_at = 0,
-        online_at = 0,
-        sub_last_user_agent:str = "",
-        admin="",
-        auto_delete_in_days = None,
-        next_plan = None
-    ):
-        self.username = username
-        self.proxies = proxies
-        self.inbounds = inbounds
-        self.expire = expire
-        self.data_limit = data_limit
-        self.data_limit_reset_strategy = data_limit_reset_strategy
-        self.status = status
-        self.used_traffic = used_traffic
-        self.lifetime_used_traffic = lifetime_used_traffic
-        self.created_at = created_at
-        self.links = links
-        self.subscription_url = subscription_url
-        self.excluded_inbounds = excluded_inbounds
-        self.note = note
-        self.on_hold_timeout = on_hold_timeout
-        self.on_hold_expire_duration = on_hold_expire_duration
-        self.sub_last_user_agent = sub_last_user_agent
-        self.online_at = online_at
-        self.sub_updated_at = sub_updated_at
-        self.admin = admin
-        self.auto_delete_in_days = auto_delete_in_days
-        self.next_plan = next_plan
+    username: str
+    proxies: Dict[str, Any]
+    inbounds: Dict[str, Any]
+    data_limit: float
+
+    data_limit_reset_strategy: str = "no_reset"
+    status: str = ""
+    expire: float = 0
+    used_traffic: int = 0
+    lifetime_used_traffic: int = 0
+    created_at: Optional[str] = None
+
+    links: List[str] = field(default_factory=list)
+    subscription_url: str = ""
+    excluded_inbounds: Dict[str, Any] = field(default_factory=dict)
+
+    note: str = ""
+    on_hold_timeout: int = 0
+    on_hold_expire_duration: int = 0
+    sub_updated_at: int = 0
+    online_at: int = 0
+    sub_last_user_agent: str = ""
+    admin: str = ""
+
+    auto_delete_in_days: Optional[int] = None
+    next_plan: Optional[Dict[str, Any]] = None
+
+
+# =========================================================
+# Methods (internal auth system)
+# =========================================================
+
 class UserMethods:
-    def add_user(self, user: User, token: dict):
-        """add new user.
 
-        Parameters:
-            user (``api.User``) : User Object
-
-            token (``dict``) : Authorization token
-
-        Returns: `~User`: api.User object
-        """
+    # -------------------------------------------
+    # Create
+    # -------------------------------------------
+    def add_user(self, user: User) -> User:
         user.status = "active"
         if user.on_hold_expire_duration:
             user.status = "on_hold"
-        request = send_request(
-            endpoint="user", token=token, method="post", data=user.__dict__
+
+        data = self._request(
+            "POST",
+            "/user",
+            json=user.__dict__,
         )
-        return User(**request)
+        return User(**data)
 
-    def get_user(self, user_username: str, token: dict):
-        """get exist user information by username.
+    # -------------------------------------------
+    # Get One
+    # -------------------------------------------
+    def get_user(self, username: str) -> User:
+        data = self._request(
+            "GET",
+            f"/user/{username}",
+        )
+        return User(**data)
 
-        Parameters:
-            user_username (``str``) : username of user
+    # -------------------------------------------
+    # Update
+    # -------------------------------------------
+    def modify_user(self, username: str, user: User) -> User:
+        data = self._request(
+            "PUT",
+            f"/user/{username}",
+            json=user.__dict__,
+        )
+        return User(**data)
 
-            token (``dict``) : Authorization token
-
-        Returns: `~User`: api.User object
-        """
-        request = send_request(f"user/{user_username}", token=token, method="get")
-        return User(**request)
-
-    def modify_user(self, user_username: str, token: dict, user: object):
-        """edit exist user by username.
-
-        Parameters:
-            user_username (``str``) : username of user
-
-            token (``dict``) : Authorization token
-
-            user (``api.User``) : User Object
-
-        Returns: `~User`: api.User object
-        """
-        request = send_request(f"user/{user_username}", token, "put", user.__dict__)
-        return User(**request)
-
-    def delete_user(self, user_username: str, token: dict):
-        """delete exist user by username.
-
-        Parameters:
-            user_username (``str``) : username of user
-
-            token (``dict``) : Authorization token
-
-        Returns: `~str`: success
-        """
-        send_request(f"user/{user_username}", token, "delete")
+    # -------------------------------------------
+    # Delete
+    # -------------------------------------------
+    def delete_user(self, username: str) -> str:
+        self._request("DELETE", f"/user/{username}")
         return "success"
 
-    def reset_user_traffic(self, user_username: str, token: dict):
-        """reset exist user traffic by username.
-
-        Parameters:
-            user_username (``str``) : username of user
-
-            token (``dict``) : Authorization token
-
-        Returns: `~str`: success
-        """
-        send_request(f"user/{user_username}/reset", token, "post")
+    # -------------------------------------------
+    # Reset Traffic
+    # -------------------------------------------
+    def reset_user_traffic(self, username: str) -> str:
+        self._request("POST", f"/user/{username}/reset")
         return "success"
-    
-    def revoke_sub(self, user_username: str, token: dict):
-        """Revoke users subscription (Subscription link and proxies) traffic by username.
 
-        Parameters:
-            user_username (``str``) : username of user
+    # -------------------------------------------
+    # Revoke Subscription
+    # -------------------------------------------
+    def revoke_sub(self, username: str) -> User:
+        data = self._request("POST", f"/user/{username}/revoke_sub")
+        return User(**data)
 
-            token (``dict``) : Authorization token
+    # -------------------------------------------
+    # List Users (clean query builder)
+    # -------------------------------------------
+    def get_all_users(
+        self,
+        username: Optional[str] = None,
+        status: Optional[str] = None,
+        search: Optional[str] = None,
+    ) -> List[User]:
 
-        Returns: `~str`: success
-        """
-        request = send_request(f"user/{user_username}/revoke_sub", token, "post")
-        return User(**request)
-    
-    def get_all_users(self, token: dict, username=None, status=None, search=None):
-        """get all users list.
+        params = {}
 
-        Parameters:
-            token (``dict``) : Authorization token
-
-        Returns:
-            `~list`: list of users
-        """
-        endpoint = "users"
         if username:
-            endpoint += f"?username={username}"
+            params["username"] = username
         if search:
-            if "?" in endpoint:
-                endpoint += f"&search={status}"
-            else:
-                endpoint += f"?search={search}"
+            params["search"] = search
         if status:
-            if "?" in endpoint:
-                endpoint += f"&status={status}"
-            else:
-                endpoint += f"?status={status}"
-        request = send_request(endpoint, token, "get")
-        user_list = [
-            User(
-                username="",
-                proxies={},
-                inbounds={},
-                expire=0,
-                data_limit=0,
-                data_limit_reset_strategy="",
-            )
-        ]
-        for user in request["users"]:
-            user_list.append(User(**user))
-        del user_list[0]
-        return user_list
+            params["status"] = status
 
-    def reset_all_users_traffic(self, token: dict):
-        """reset all users traffic.
+        data = self._request("GET", "/users", params=params)
 
-        Parameters:
-            token (``dict``) : Authorization token
+        return [User(**u) for u in data.get("users", [])]
 
-        Returns: `~str`: success
-        """
-        send_request("users/reset", token, "post")
+    # -------------------------------------------
+    # Reset All
+    # -------------------------------------------
+    def reset_all_users_traffic(self) -> str:
+        self._request("POST", "/users/reset")
         return "success"
 
-    def get_user_usage(self, user_username: str, token: dict):
-        """get user usage by username.
+    # -------------------------------------------
+    # Usage
+    # -------------------------------------------
+    def get_user_usage(self, username: str) -> Dict[str, Any]:
+        data = self._request("GET", f"/user/{username}/usage")
+        return data.get("usages", {})
 
-        Parameters:
-            user_username (``str``) : username of user
-
-            token (``dict``) : Authorization token
-
-        Returns: `~dict`: dict of user usage
-        """
-        return send_request(f"user/{user_username}/usage", token, "get")["usages"]
-
-    def get_all_users_count(self, token: dict):
-        """get all users count.
-
-        Parameters:
-            token (``dict``) : Authorization token
-
-        Returns: `~int`: count of users
-        """
-        return self.get_all_users(token)["content"]["total"]
-
+    # -------------------------------------------
+    # Count
+    # -------------------------------------------
+    def get_all_users_count(self) -> int:
+        data = self._request("GET", "/users")
+        return data.get("content", {}).get("total", 0)

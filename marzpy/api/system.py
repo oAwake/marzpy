@@ -1,50 +1,33 @@
-from .send_requests import send_request
-
-
 class System:
-    def __init__(self) -> None:
-        pass
-
-    def get_system_stats(self, token: dict):
-        """get server stats.
-
-        Parameters:
-            token (``dict``): Authorization token
-
-        Returns:
-            `~dict`: server stats
+    # --------------------------------------------------
+    # System Stats
+    # --------------------------------------------------
+    def get_system_stats(self):
         """
-        return send_request(endpoint="system", token=token, method="get")
-
-    def get_inbounds(self, token: dict):
-        """get server inbounds.
-
-        Parameters:
-            token (``dict``): Authorization token
-
-        Returns:
-            `~dict`: server inbounds
+        Returns server stats
         """
-        return send_request(endpoint="inbounds", token=token, method="get")
+        return self._request("GET", "/system")
 
-    def get_hosts(self, token: dict):
-        """get server hosts.
-
-        Parameters:
-            token (``dict``): Authorization token
-
-        Returns:
-            `~dict`: server hosts
+    # --------------------------------------------------
+    # Inbounds
+    # --------------------------------------------------
+    def get_inbounds(self):
         """
-        return send_request(endpoint="hosts", token=token, method="get")
-
-    def modify_hosts(self, token: dict, data: dict):
-        """get server hosts.
-
-        Parameters:
-            token (``dict``): Authorization token
-            data (``dict``) : new hosts data
-        Returns:
-            `~dict`: server hosts
+        Returns server inbounds
         """
-        return send_request(endpoint="hosts", token=token, method="put", data=data)
+        return self._request("GET", "/inbounds")
+
+    # --------------------------------------------------
+    # Hosts
+    # --------------------------------------------------
+    def get_hosts(self):
+        """
+        Returns server hosts
+        """
+        return self._request("GET", "/hosts")
+
+    def modify_hosts(self, data: dict):
+        """
+        Updates server hosts
+        """
+        return self._request("PUT", "/hosts", json=data)

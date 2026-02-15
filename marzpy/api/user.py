@@ -53,7 +53,7 @@ class UserMethods:
         data = self._request(
             "POST",
             "/user",
-            json=user.__dict__,
+            json_data=user.__dict__,
         )
         return User(**data)
 
@@ -74,7 +74,7 @@ class UserMethods:
         data = self._request(
             "PUT",
             f"/user/{username}",
-            json=user.__dict__,
+            json_data=user.__dict__,
         )
         return User(**data)
 

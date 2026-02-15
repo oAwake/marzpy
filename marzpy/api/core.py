@@ -22,5 +22,5 @@ class Core:
         """
         Update Xray config
         """
-        self._request("PUT", "/core/config", json=config)
+        self._request("PUT", "/core/config", json_data=config)
         return "success"

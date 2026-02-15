@@ -23,7 +23,7 @@ class NodeMethods:
         data = self._request(
             "POST",
             "/node",
-            json=node.__dict__,
+            json_data=node.__dict__,
         )
         return Node(**data)
 
@@ -45,7 +45,7 @@ class NodeMethods:
         data = self._request(
             "PUT",
             f"/node/{node_id}",
-            json=node.__dict__,
+            json_data=node.__dict__,
         )
         return Node(**data)
 

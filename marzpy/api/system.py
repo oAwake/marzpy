@@ -30,4 +30,4 @@ class System:
         """
         Updates server hosts
         """
-        return self._request("PUT", "/hosts", json=data)
+        return self._request("PUT", "/hosts", json_data=data)

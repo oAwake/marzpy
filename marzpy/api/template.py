@@ -37,7 +37,7 @@ class TemplateMethods:
         data = self._request(
             "POST",
             "/user_template",
-            json=template.__dict__,
+            json_data=template.__dict__,
         )
         return Template(**data)
 
@@ -58,7 +58,7 @@ class TemplateMethods:
         data = self._request(
             "PUT",
             f"/user_template/{template_id}",
-            json=template.__dict__,
+            json_data=template.__dict__,
         )
         return Template(**data)
 

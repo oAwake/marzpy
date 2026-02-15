@@ -52,7 +52,7 @@ class UserMethods:
 
         data = self._request(
             "POST",
-            "/user",
+            "user",
             json_data=user.__dict__,
         )
         return User(**data)
@@ -63,7 +63,7 @@ class UserMethods:
     def get_user(self, username: str) -> User:
         data = self._request(
             "GET",
-            f"/user/{username}",
+            f"user/{username}",
         )
         return User(**data)
 
@@ -73,7 +73,7 @@ class UserMethods:
     def modify_user(self, username: str, user: User) -> User:
         data = self._request(
             "PUT",
-            f"/user/{username}",
+            f"user/{username}",
             json_data=user.__dict__,
         )
         return User(**data)
@@ -82,21 +82,21 @@ class UserMethods:
     # Delete
     # -------------------------------------------
     def delete_user(self, username: str) -> str:
-        self._request("DELETE", f"/user/{username}")
+        self._request("DELETE", f"user/{username}")
         return "success"
 
     # -------------------------------------------
     # Reset Traffic
     # -------------------------------------------
     def reset_user_traffic(self, username: str) -> str:
-        self._request("POST", f"/user/{username}/reset")
+        self._request("POST", f"user/{username}/reset")
         return "success"
 
     # -------------------------------------------
     # Revoke Subscription
     # -------------------------------------------
     def revoke_sub(self, username: str) -> User:
-        data = self._request("POST", f"/user/{username}/revoke_sub")
+        data = self._request("POST", f"user/{username}/revoke_sub")
         return User(**data)
 
     # -------------------------------------------
@@ -118,7 +118,7 @@ class UserMethods:
         if status:
             params["status"] = status
 
-        data = self._request("GET", "/users", params=params)
+        data = self._request("GET", "users", params=params)
 
         return [User(**u) for u in data.get("users", [])]
 
@@ -126,19 +126,19 @@ class UserMethods:
     # Reset All
     # -------------------------------------------
     def reset_all_users_traffic(self) -> str:
-        self._request("POST", "/users/reset")
+        self._request("POST", "users/reset")
         return "success"
 
     # -------------------------------------------
     # Usage
     # -------------------------------------------
     def get_user_usage(self, username: str) -> Dict[str, Any]:
-        data = self._request("GET", f"/user/{username}/usage")
+        data = self._request("GET", f"user/{username}/usage")
         return data.get("usages", {})
 
     # -------------------------------------------
     # Count
     # -------------------------------------------
     def get_all_users_count(self) -> int:
-        data = self._request("GET", "/users")
+        data = self._request("GET", "users")
         return data.get("content", {}).get("total", 0)

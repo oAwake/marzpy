@@ -6,7 +6,7 @@ class System:
         """
         Returns server stats
         """
-        return self._request("GET", "/system")
+        return self._request("GET", "system")
 
     # --------------------------------------------------
     # Inbounds
@@ -15,7 +15,7 @@ class System:
         """
         Returns server inbounds
         """
-        return self._request("GET", "/inbounds")
+        return self._request("GET", "inbounds")
 
     # --------------------------------------------------
     # Hosts
@@ -24,10 +24,10 @@ class System:
         """
         Returns server hosts
         """
-        return self._request("GET", "/hosts")
+        return self._request("GET", "hosts")
 
     def modify_hosts(self, data: dict):
         """
         Updates server hosts
         """
-        return self._request("PUT", "/hosts", json_data=data)
+        return self._request("PUT", "hosts", json_data=data)

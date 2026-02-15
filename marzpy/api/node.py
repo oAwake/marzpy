@@ -22,7 +22,7 @@ class NodeMethods:
     def add_node(self, node: Node) -> Node:
         data = self._request(
             "POST",
-            "/node",
+            "node",
             json_data=node.__dict__,
         )
         return Node(**data)
@@ -31,11 +31,11 @@ class NodeMethods:
     # Read
     # ----------------------------------------
     def get_node_by_id(self, node_id: int) -> Node:
-        data = self._request("GET", f"/node/{node_id}")
+        data = self._request("GET", f"node/{node_id}")
         return Node(**data)
 
     def get_all_nodes(self) -> List[Node]:
-        data = self._request("GET", "/nodes")
+        data = self._request("GET", "nodes")
         return [Node(**node) for node in data]
 
     # ----------------------------------------
@@ -44,7 +44,7 @@ class NodeMethods:
     def modify_node_by_id(self, node_id: int, node: Node) -> Node:
         data = self._request(
             "PUT",
-            f"/node/{node_id}",
+            f"node/{node_id}",
             json_data=node.__dict__,
         )
         return Node(**data)
@@ -53,16 +53,16 @@ class NodeMethods:
     # Delete
     # ----------------------------------------
     def delete_node(self, node_id: int) -> str:
-        self._request("DELETE", f"/node/{node_id}")
+        self._request("DELETE", f"node/{node_id}")
         return "success"
 
     # ----------------------------------------
     # Actions
     # ----------------------------------------
     def reconnect_node(self, node_id: int) -> str:
-        self._request("POST", f"/node/{node_id}/reconnect")
+        self._request("POST", f"node/{node_id}/reconnect")
         return "success"
 
     def get_nodes_usage(self):
-        data = self._request("GET", "/nodes/usage")
+        data = self._request("GET", "nodes/usage")
         return data.get("usages", [])

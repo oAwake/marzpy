@@ -9,18 +9,18 @@ class Core:
         """
         Restart Xray core
         """
-        self._request("POST", "/core/restart")
+        self._request("POST", "core/restart")
         return "success"
 
     def get_xray_config(self):
         """
         Get Xray config
         """
-        return self._request("GET", "/core/config")
+        return self._request("GET", "core/config")
 
     def modify_xray_config(self, config: dict):
         """
         Update Xray config
         """
-        self._request("PUT", "/core/config", json_data=config)
+        self._request("PUT", "core/config", json_data=config)
         return "success"

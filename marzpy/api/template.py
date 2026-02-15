@@ -27,7 +27,7 @@ class TemplateMethods:
     # Get All
     # -------------------------------------------
     def get_all_templates(self):
-        data = self._request("GET", "/user_template")
+        data = self._request("GET", "user_template")
         return [Template(**t) for t in data]
 
     # -------------------------------------------
@@ -36,7 +36,7 @@ class TemplateMethods:
     def add_template(self, template: Template):
         data = self._request(
             "POST",
-            "/user_template",
+            "user_template",
             json_data=template.__dict__,
         )
         return Template(**data)
@@ -47,7 +47,7 @@ class TemplateMethods:
     def get_template_by_id(self, template_id: int):
         data = self._request(
             "GET",
-            f"/user_template/{template_id}",
+            f"user_template/{template_id}",
         )
         return Template(**data)
 
@@ -57,7 +57,7 @@ class TemplateMethods:
     def modify_template_by_id(self, template_id: int, template: Template):
         data = self._request(
             "PUT",
-            f"/user_template/{template_id}",
+            f"user_template/{template_id}",
             json_data=template.__dict__,
         )
         return Template(**data)
@@ -68,6 +68,6 @@ class TemplateMethods:
     def delete_template_by_id(self, template_id: int):
         self._request(
             "DELETE",
-            f"/user_template/{template_id}",
+            f"user_template/{template_id}",
         )
         return "success"
